@@ -1,15 +1,28 @@
 package com.company;
 
+import com.company.buildings.Farm;
+import com.company.buildings.HouseForAnimal;
+
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
 
 public class Game {
-    public Double cash = 1000.0;
-    public Integer week = 1;
+    public Integer cash;
+    public Integer week;
+    public List<Farm> farmList;
+
+    public Game() {
+        this.cash = 1000;
+        this.week = 1;
+        this.farmList = new ArrayList<Farm>();
+    }
 
     public void startGame() {
         System.out.println("Wpisz 'tak', jezeli chcesz rozpoczac gre.");
         Scanner scanner = new Scanner(System.in);
         String answer = scanner.next();
+
         if (answer.equals("tak")) {
             gameOn();
         } else if (answer.equals("nie")) {
@@ -20,22 +33,35 @@ public class Game {
     }
 
     public void gameOn() {
+        View view = new View();
+
         while (true) {
-            System.out.println("Menu:");
-            System.out.println("1. Zakup farmy.\n2. Zakup ziemi uprawnej.\n3. Sprzedaz ziemi uprawnej.\n" +
-                    "4. Zakup budynkow.\n5. Zakup zwierzat.\n6. Zakup roslin.\n7. Posadzenie roslin.\n" +
-                    "8. Zbiory roslin.\n9. Sprzedaz roslin.\n10. Sprzedaz zwierzat.\n11. Sprawdzenie stanu zapasow.\n" +
-                    "12. Przejrzenie informacji o posiadanych zwierzetach.\n13. Przejrzenie informacji o zasadzonych " +
-                    "roslinach.\n0. Zakonczenie tygodnia");
-            Scanner scanner = new Scanner(System.in);
-            int menuNumber = scanner.nextInt();
-            switch (menuNumber) {
+            switch (view.mainMenu()) {
                 case 1:
-                    System.out.println("Wybrano 1");
-                    System.out.println("Powrot do menu. Wpisz 'e'");
-                    String backToMenu = scanner.next();
-                    if (!backToMenu.equals("e")) {
-                        System.out.println("...");
+                    System.out.println("Lista farm do kupienia: ");
+
+                    Farm farm1 = new Farm();
+                    farm1.addBuildings(new HouseForAnimal(300));
+
+                    Farm farm2 = new Farm();
+
+                    Farm farm3 = new Farm();
+                    farm3.addBuildings(new HouseForAnimal(300));
+                    farm3.addBuildings(new HouseForAnimal(150));
+
+                    List<Farm> farmsToDisplay = new ArrayList<Farm>();
+                    farmsToDisplay.add(farm1);
+                    farmsToDisplay.add(farm2);
+                    farmsToDisplay.add(farm3);
+
+                    int numberOfOption = view.printFarms(farmsToDisplay, true) - 1;
+                    if (numberOfOption > 0) {
+                        if (this.cash >= farmsToDisplay.get(numberOfOption).price) {
+                            this.farmList.add(farmsToDisplay.get(numberOfOption));
+                            this.cash -= farmsToDisplay.get(numberOfOption).price;
+                        } else {
+                            System.out.println("Masz za malo gotowki, by kupic te farme.");
+                        }
                     }
                     break;
                 case 2:
