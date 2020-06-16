@@ -1,6 +1,6 @@
 package com.company;
 
-import com.company.buildings.BreedingBuilding;
+import com.company.buildings.Building;
 import com.company.buildings.Farm;
 
 import java.util.List;
@@ -31,7 +31,7 @@ public class View {
     public int printFarms(List<Farm> farms, boolean choose) {
         for (int i = 0; i < farms.size(); i++) {
             System.out.println("-- FARMA " + (i + 1) + " -----------------\t\t cena: " + farms.get(i).priceFarm() + " zl");
-            for (BreedingBuilding building : farms.get(i).getBuildings()) {
+            for (Building building : farms.get(i).getBuildings()) {
                 System.out.println(building);
             }
             System.out.print("\n");

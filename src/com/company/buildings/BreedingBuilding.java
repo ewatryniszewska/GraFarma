@@ -1,24 +1,21 @@
 package com.company.buildings;
 
-public class BreedingBuilding {
-    public static final String NAME = "Budynek hodowlany";
-    private int price;
+public class BreedingBuilding extends Building {
     private int maxNumberOfAnimals;
 
     public BreedingBuilding(int price, int maxNumberOfAnimals) {
+        this.name = "Budynek hodowlany";
+
         this.price = price;
         this.maxNumberOfAnimals = maxNumberOfAnimals;
-    }
-
-    public int getPrice() {
-        return price;
     }
 
     public int getMaxNumberOfAnimals() {
         return maxNumberOfAnimals;
     }
 
+    @Override
     public String toString() {
-        return NAME + ";\t" + price + " zl;\t" + maxNumberOfAnimals + " max szt. zwierzat";
+        return name + ";\t" + price + " zl;\t" + maxNumberOfAnimals + " max szt. zwierzat";
     }
 }

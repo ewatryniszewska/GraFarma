@@ -4,17 +4,17 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Farm {
-    private List<BreedingBuilding> buildings;
+    private List<Building> buildings;
 
     public Farm() {
         this.buildings = new ArrayList<>();
     }
 
-    public List<BreedingBuilding> getBuildings() {
+    public List<Building> getBuildings() {
         return buildings;
     }
 
-    public void addBuilding(BreedingBuilding building) {
+    public void addBuilding(Building building) {
         buildings.add(building);
     }
 
@@ -29,7 +29,7 @@ public class Farm {
     public int priceFarm() {
         int price = 10000;
 
-        for (BreedingBuilding building : buildings) {
+        for (Building building : buildings) {
             if (building == null) {
                 price += 0;
             } else {
