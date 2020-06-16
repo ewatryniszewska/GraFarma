@@ -1,21 +1,26 @@
 package com.company;
 
 import com.company.buildings.Farm;
-import com.company.buildings.HouseForAnimal;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
 public class Game {
-    public Integer cash;
-    public Integer week;
-    public List<Farm> farmList;
+    private Player player;
+
+    private int week;
+    private List<Farm> farmsToOffer;
+
+    private Generator generator;
 
     public Game() {
-        this.cash = 1000;
+        player = new Player(100000);
+
         this.week = 1;
-        this.farmList = new ArrayList<Farm>();
+
+        generator = new Generator();
+        // generating potential farms to buy
+        farmsToOffer = generator.generateFarms(Config.NUMBER_OF_FARMS_TO_OFFER);
     }
 
     public void startGame() {
@@ -40,25 +45,13 @@ public class Game {
                 case 1:
                     System.out.println("Lista farm do kupienia: ");
 
-                    Farm farm1 = new Farm();
-                    farm1.addBuildings(new HouseForAnimal(300));
-
-                    Farm farm2 = new Farm();
-
-                    Farm farm3 = new Farm();
-                    farm3.addBuildings(new HouseForAnimal(300));
-                    farm3.addBuildings(new HouseForAnimal(150));
-
-                    List<Farm> farmsToDisplay = new ArrayList<Farm>();
-                    farmsToDisplay.add(farm1);
-                    farmsToDisplay.add(farm2);
-                    farmsToDisplay.add(farm3);
-
-                    int numberOfOption = view.printFarms(farmsToDisplay, true) - 1;
+                    int numberOfOption = view.printFarms(farmsToOffer, true) - 1;
                     if (numberOfOption > 0) {
-                        if (this.cash >= farmsToDisplay.get(numberOfOption).price) {
-                            this.farmList.add(farmsToDisplay.get(numberOfOption));
-                            this.cash -= farmsToDisplay.get(numberOfOption).price;
+                        int farmPrice = farmsToOffer.get(numberOfOption).priceFarm();
+                        if (player.getCash() >= farmPrice) {
+                            player.getFarmList().add(farmsToOffer.get(numberOfOption));
+                            player.subtractCash(farmPrice);
+                            farmsToOffer.set(numberOfOption, generator.generateFarm());
                         } else {
                             System.out.println("Masz za malo gotowki, by kupic te farme.");
                         }
