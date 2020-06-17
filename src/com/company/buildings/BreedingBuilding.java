@@ -4,8 +4,7 @@ public class BreedingBuilding extends Building {
     private int maxNumberOfAnimals;
 
     public BreedingBuilding(int price, int maxNumberOfAnimals) {
-        this.name = "Budynek hodowlany";
-
+        name = "Budynek hodowlany";
         this.price = price;
         this.maxNumberOfAnimals = maxNumberOfAnimals;
     }

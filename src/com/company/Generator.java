@@ -10,7 +10,9 @@ import java.util.concurrent.ThreadLocalRandom;
 
 public class Generator {
     public Farm generateFarm() {
-        Farm farm = new Farm();
+        int randomLandArea = ThreadLocalRandom.current().nextInt(10, 100);
+
+        Farm farm = new Farm(randomLandArea);
 
         int randomNumOfBreeding = ThreadLocalRandom.current().nextInt(0, 4);
         int randomNumOfWarehouse = ThreadLocalRandom.current().nextInt(0, 4);
@@ -19,8 +21,7 @@ public class Generator {
             farm.addBuilding(generateBreedingBuilding());
         }
 
-        int length = farm.getBuildings().size() + randomNumOfWarehouse;
-        for (int i = farm.getBuildings().size(); i < length; i++) {
+        for (int i = 0; i < randomNumOfWarehouse; i++) {
             farm.addBuilding(generateWarehouse());
         }
 
@@ -43,7 +44,7 @@ public class Generator {
 
     public Warehouse generateWarehouse() {
         int randomFodderWeight = ThreadLocalRandom.current().nextInt(1, 10) * 10000;
-        int randomPricePerFodderWeight = ThreadLocalRandom.current().nextInt(1, 2);
+        int randomPricePerFodderWeight = ThreadLocalRandom.current().nextInt(1, 3);
         return new Warehouse(randomPricePerFodderWeight * randomFodderWeight, randomFodderWeight);
     }
 }

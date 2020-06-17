@@ -3,11 +3,15 @@ package com.company.buildings;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.company.Config.HECTARE_PRICE;
+
 public class Farm {
     private List<Building> buildings;
+    private int landArea;
 
-    public Farm() {
-        this.buildings = new ArrayList<>();
+    public Farm(int landArea) {
+        buildings = new ArrayList<>();
+        this.landArea = landArea;
     }
 
     public List<Building> getBuildings() {
@@ -22,21 +26,39 @@ public class Farm {
         buildings.remove(index);
     }
 
-    public String toString() {
-        return "Budynki: " + buildings;
+    public int getLandArea() {
+        return landArea;
     }
 
-    public int priceFarm() {
-        int price = 10000;
+    public void addLandArea(int addLand) {
+        landArea += addLand;
+    }
 
+    public void subtractLandArea(int subtractLand) {
+        landArea -= subtractLand;
+    }
+
+    public String toString() {
+        StringBuilder farmStr = new StringBuilder();
+        farmStr.append("Całkowita wartość farmy: ").append(farmValue()).append(" zl \n");
+        for (Building building : getBuildings()) {
+            farmStr.append(building).append("\n");
+        }
+        farmStr.append("Powierzchnia ziemi uprawnej: ").append(getLandArea()).append(" ha");
+        return farmStr.toString();
+    }
+
+    public int farmValue() {
+        int value = 0;
         for (Building building : buildings) {
             if (building == null) {
-                price += 0;
+                value += 0;
             } else {
-                price += building.getPrice();
+                value += building.getPrice();
             }
         }
+        value += getLandArea() * HECTARE_PRICE;
 
-        return price;
+        return value;
     }
 }

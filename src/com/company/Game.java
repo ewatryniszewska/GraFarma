@@ -5,6 +5,8 @@ import com.company.buildings.Farm;
 import java.util.List;
 import java.util.Scanner;
 
+import static com.company.Config.*;
+
 public class Game {
     private Player player;
 
@@ -14,13 +16,12 @@ public class Game {
     private Generator generator;
 
     public Game() {
-        player = new Player(100000);
-
-        this.week = 1;
-
+        player = new Player(10000000);
+        week = 1;
         generator = new Generator();
+
         // generating potential farms to buy
-        farmsToOffer = generator.generateFarms(Config.NUMBER_OF_FARMS_TO_OFFER);
+        farmsToOffer = generator.generateFarms(NUMBER_OF_FARMS_TO_OFFER);
     }
 
     public void startGame() {
@@ -39,29 +40,53 @@ public class Game {
 
     public void gameOn() {
         View view = new View();
+        int selectedOption;
 
         while (true) {
+            view.printGameInfo(week, player);
             switch (view.mainMenu()) {
                 case 1:
                     System.out.println("Lista farm do kupienia: ");
 
-                    int numberOfOption = view.printFarms(farmsToOffer, true) - 1;
-                    if (numberOfOption > 0) {
-                        int farmPrice = farmsToOffer.get(numberOfOption).priceFarm();
+                    selectedOption = view.printFarms(farmsToOffer, true);
+                    if (selectedOption >= 0) {
+                        int farmPrice = farmsToOffer.get(selectedOption).farmValue();
                         if (player.getCash() >= farmPrice) {
-                            player.getFarmList().add(farmsToOffer.get(numberOfOption));
+                            player.getFarmList().add(farmsToOffer.get(selectedOption));
                             player.subtractCash(farmPrice);
-                            farmsToOffer.set(numberOfOption, generator.generateFarm());
+                            farmsToOffer.set(selectedOption, generator.generateFarm());
+                            System.out.println("Kupiles farme " + (selectedOption + 1));
                         } else {
                             System.out.println("Masz za malo gotowki, by kupic te farme.");
                         }
                     }
                     break;
                 case 2:
-                    System.out.println("Wybrano 2");
+                    System.out.println("Wybierz farme do ktorej chcesz dokupic ziemie: ");
+                    selectedOption = view.printFarms(player.getFarmList(), true);
+                    if (selectedOption >= 0) {
+                        System.out.println("Ile hektarow chcesz kupic? (" + HECTARE_PRICE + " zl/ha)");
+                        int ha = view.getInteger(0);
+                        if (player.getCash() >= ha * HECTARE_PRICE) {
+                            player.getFarmList().get(selectedOption).addLandArea(ha);
+                            player.subtractCash(ha * HECTARE_PRICE);
+                            System.out.println("Zakupiono " + ha + " ha do farmy.");
+                        } else {
+                            System.out.println("Za malo gotowki zeby kupic tyle ziemi.");
+                        }
+                    }
                     break;
                 case 3:
-                    System.out.println("Wybrano 3");
+                    System.out.println("Wybierz farme z ktorej chcesz sprzedac ziemie: ");
+                    selectedOption = view.printFarms(player.getFarmList(), true);
+                    if (selectedOption >= 0) {
+                        Farm selectedFarm = player.getFarmList().get(selectedOption);
+                        System.out.println("Ile hektarow chcesz kupic? (" + HECTARE_PRICE * VALUE_LOSS + " zl/ha)");
+                        int ha = view.getInteger(0, selectedFarm.getLandArea());
+                        selectedFarm.subtractLandArea(ha);
+                        player.addCash((int) (ha * HECTARE_PRICE * VALUE_LOSS));
+                        System.out.println("Sprzedano " + ha + " ha z farmy.");
+                    }
                     break;
                 case 4:
                     System.out.println("Wybrano 4");
