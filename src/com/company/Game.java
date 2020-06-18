@@ -40,7 +40,7 @@ public class Game {
 
     public void gameOn() {
         View view = new View();
-        int selectedOption;
+        int selectedOption, ha;
 
         while (true) {
             view.printGameInfo(week, player);
@@ -49,47 +49,70 @@ public class Game {
                     System.out.println("Lista farm do kupienia: ");
 
                     selectedOption = view.printFarms(farmsToOffer, true);
-                    if (selectedOption >= 0) {
-                        int farmPrice = farmsToOffer.get(selectedOption).farmValue();
-                        if (player.getCash() >= farmPrice) {
-                            player.getFarmList().add(farmsToOffer.get(selectedOption));
-                            player.subtractCash(farmPrice);
-                            farmsToOffer.set(selectedOption, generator.generateFarm());
-                            System.out.println("Kupiles farme " + (selectedOption + 1));
-                        } else {
-                            System.out.println("Masz za malo gotowki, by kupic te farme.");
-                        }
+                    if (selectedOption < 0) {
+                        break;
+                    }
+
+                    int farmPrice = farmsToOffer.get(selectedOption).farmValue();
+                    if (player.getCash() >= farmPrice) {
+                        player.getFarmList().add(farmsToOffer.get(selectedOption));
+                        player.subtractCash(farmPrice);
+                        farmsToOffer.set(selectedOption, generator.generateFarm());
+                        System.out.println("Kupiles farme " + (selectedOption + 1));
+                    } else {
+                        System.out.println("Masz za malo gotowki, by kupic te farme.");
                     }
                     break;
                 case 2:
                     System.out.println("Wybierz farme do ktorej chcesz dokupic ziemie: ");
                     selectedOption = view.printFarms(player.getFarmList(), true);
-                    if (selectedOption >= 0) {
-                        System.out.println("Ile hektarow chcesz kupic? (" + HECTARE_PRICE + " zl/ha)");
-                        int ha = view.getInteger(0);
-                        if (player.getCash() >= ha * HECTARE_PRICE) {
-                            player.getFarmList().get(selectedOption).addLandArea(ha);
-                            player.subtractCash(ha * HECTARE_PRICE);
-                            System.out.println("Zakupiono " + ha + " ha do farmy.");
-                        } else {
-                            System.out.println("Za malo gotowki zeby kupic tyle ziemi.");
-                        }
+                    if (selectedOption < 0) {
+                        break;
+                    }
+
+                    System.out.println("Ile hektarow chcesz kupic? (" + HECTARE_PRICE + " zl/ha)");
+                    ha = view.getInteger(0);
+                    if (player.getCash() >= ha * HECTARE_PRICE) {
+                        player.getFarmList().get(selectedOption).addLandArea(ha);
+                        player.subtractCash(ha * HECTARE_PRICE);
+                        System.out.println("Zakupiono " + ha + " ha do farmy.");
+                    } else {
+                        System.out.println("Za malo gotowki zeby kupic tyle ziemi.");
                     }
                     break;
                 case 3:
                     System.out.println("Wybierz farme z ktorej chcesz sprzedac ziemie: ");
                     selectedOption = view.printFarms(player.getFarmList(), true);
-                    if (selectedOption >= 0) {
-                        Farm selectedFarm = player.getFarmList().get(selectedOption);
-                        System.out.println("Ile hektarow chcesz kupic? (" + HECTARE_PRICE * VALUE_LOSS + " zl/ha)");
-                        int ha = view.getInteger(0, selectedFarm.getLandArea());
-                        selectedFarm.subtractLandArea(ha);
-                        player.addCash((int) (ha * HECTARE_PRICE * VALUE_LOSS));
-                        System.out.println("Sprzedano " + ha + " ha z farmy.");
+                    if (selectedOption < 0) {
+                        break;
                     }
+
+                    Farm selectedFarm = player.getFarmList().get(selectedOption);
+                    System.out.println("Ile hektarow chcesz sprzedac? (" + HECTARE_PRICE * VALUE_LOSS + " zl/ha)");
+                    ha = view.getInteger(0, selectedFarm.getLandArea());
+                    selectedFarm.subtractLandArea(ha);
+                    player.addCash((int) (ha * HECTARE_PRICE * VALUE_LOSS));
+                    System.out.println("Sprzedano " + ha + " ha z farmy.");
                     break;
                 case 4:
-                    System.out.println("Wybrano 4");
+                    System.out.println("Wybierz farme do ktorej chcesz dokupic budynki: ");
+                    selectedOption = view.printFarms(player.getFarmList(), true);
+                    if (selectedOption < 0) {
+                        break;
+                    }
+
+                    int numberOfBuilding = view.printBuildings(BUILDINGS, true);
+                    if (numberOfBuilding < 0) {
+                        break;
+                    }
+
+                    if (player.getCash() >= BUILDINGS[numberOfBuilding].getPrice()) {
+                        player.getFarmList().get(selectedOption).addBuilding(BUILDINGS[numberOfBuilding]);
+                        player.subtractCash(BUILDINGS[numberOfBuilding].getPrice());
+                        System.out.println("Kupiono " + BUILDINGS[numberOfBuilding] + " do farmy.");
+                    } else {
+                        System.out.println("Za malo gotowki, zeby kupic ten budynek.");
+                    }
                     break;
                 case 5:
                     System.out.println("Wybrano 5");
