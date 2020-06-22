@@ -1,7 +1,9 @@
 package com.company;
 
+import com.company.buildings.BreedingBuilding;
 import com.company.buildings.Farm;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Scanner;
 
@@ -40,7 +42,7 @@ public class Game {
 
     public void gameOn() {
         View view = new View();
-        int selectedOption, ha;
+        int selectedOption, numberOfBuilding, itemChoice, numberOfItems;
 
         while (true) {
             view.printGameInfo(week, player);
@@ -71,11 +73,11 @@ public class Game {
                     }
 
                     System.out.println("Ile hektarow chcesz kupic? (" + HECTARE_PRICE + " zl/ha)");
-                    ha = view.getInteger(0);
-                    if (player.getCash() >= ha * HECTARE_PRICE) {
-                        player.getFarmList().get(selectedOption).addLandArea(ha);
-                        player.subtractCash(ha * HECTARE_PRICE);
-                        System.out.println("Zakupiono " + ha + " ha do farmy.");
+                    numberOfItems = view.getInteger(0);
+                    if (player.getCash() >= numberOfItems * HECTARE_PRICE) {
+                        player.getFarmList().get(selectedOption).addLandArea(numberOfItems);
+                        player.subtractCash(numberOfItems * HECTARE_PRICE);
+                        System.out.println("Zakupiono " + numberOfItems + " ha do farmy.");
                     } else {
                         System.out.println("Za malo gotowki zeby kupic tyle ziemi.");
                     }
@@ -89,10 +91,10 @@ public class Game {
 
                     Farm selectedFarm = player.getFarmList().get(selectedOption);
                     System.out.println("Ile hektarow chcesz sprzedac? (" + HECTARE_PRICE * VALUE_LOSS + " zl/ha)");
-                    ha = view.getInteger(0, selectedFarm.getLandArea());
-                    selectedFarm.subtractLandArea(ha);
-                    player.addCash((int) (ha * HECTARE_PRICE * VALUE_LOSS));
-                    System.out.println("Sprzedano " + ha + " ha z farmy.");
+                    numberOfItems = view.getInteger(0, selectedFarm.getLandArea());
+                    selectedFarm.subtractLandArea(numberOfItems);
+                    player.addCash((int) (numberOfItems * HECTARE_PRICE * VALUE_LOSS));
+                    System.out.println("Sprzedano " + numberOfItems + " ha z farmy.");
                     break;
                 case 4:
                     System.out.println("Wybierz farme do ktorej chcesz dokupic budynki: ");
@@ -101,7 +103,7 @@ public class Game {
                         break;
                     }
 
-                    int numberOfBuilding = view.printBuildings(BUILDINGS, true);
+                    numberOfBuilding = view.printList(Arrays.asList(BUILDINGS), true);
                     if (numberOfBuilding < 0) {
                         break;
                     }
@@ -115,7 +117,42 @@ public class Game {
                     }
                     break;
                 case 5:
-                    System.out.println("Wybrano 5");
+                    System.out.println("Wybierz farme do ktorej chcesz kupic zwierzeta: ");
+                    selectedOption = view.printFarms(player.getFarmList(), true);
+                    if (selectedOption < 0) {
+                        break;
+                    }
+
+                    System.out.println("Wybierz budynek, do ktorego chcesz kupic zwierzeta: ");
+                    List<BreedingBuilding> bb = player.getFarmList().get(selectedOption).getBreedingBuildings();
+                    numberOfBuilding = view.printList(bb, true);
+                    if (numberOfBuilding < 0) {
+                        break;
+                    }
+
+                    if (bb.get(numberOfBuilding).getLeftSpace() <= 0) {
+                        System.out.println("W wybranym budynku nie ma już miejsca");
+                        break;
+                    }
+
+                    List<AnimalsSpecies> as = Arrays.asList(AnimalsSpecies.values());
+                    itemChoice = view.printList(as, true);
+                    if (itemChoice < 0) {
+                        break;
+                    }
+
+                    if (as.get(itemChoice).immaturePrice > player.getCash()) {
+                        System.out.println("Nie masz wystarczającej ilości gotówki, aby zakupić wybrane zwierzęta");
+                        break;
+                    }
+
+                    numberOfItems = view.getInteger(0, Math.min(
+                            bb.get(numberOfBuilding).getLeftSpace(),
+                            player.getCash() / as.get(itemChoice).immaturePrice));
+
+                    bb.get(numberOfBuilding).addAnimals(as.get(itemChoice), numberOfItems);
+                    player.subtractCash(as.get(itemChoice).immaturePrice * numberOfItems);
+
                     break;
                 case 6:
                     System.out.println("Wybrano 6");

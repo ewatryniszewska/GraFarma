@@ -18,6 +18,26 @@ public class Farm {
         return buildings;
     }
 
+    public List<BreedingBuilding> getBreedingBuildings() {
+        List<BreedingBuilding> breedingBuildings = new ArrayList<>();
+        for (Building building : buildings) {
+            if (building instanceof BreedingBuilding) {
+                breedingBuildings.add((BreedingBuilding) building);
+            }
+        }
+        return breedingBuildings;
+    }
+
+    public List<Building> getWarehouses() {
+        List<Building> warehouses = new ArrayList<>();
+        for (Building building : buildings) {
+            if (building instanceof Warehouse) {
+                warehouses.add(building);
+            }
+        }
+        return warehouses;
+    }
+
     public void addBuilding(Building building) {
         buildings.add(building);
     }

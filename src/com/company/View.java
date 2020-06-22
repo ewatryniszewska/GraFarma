@@ -1,6 +1,5 @@
 package com.company;
 
-import com.company.buildings.Building;
 import com.company.buildings.Farm;
 
 import java.util.List;
@@ -69,18 +68,18 @@ public class View {
         return selectedNumber;
     }
 
-    public void printBuildings(Building[] buildings) {
-        printBuildings(buildings, false);
+    public void printList(List<?> list) {
+        printList(list, false);
     }
 
-    public int printBuildings(Building[] buildings, boolean choose) {
-        for (int i = 0; i < buildings.length; i++) {
-            System.out.println((i + 1) + ".\t" + buildings[i]);
+    public int printList(List<?> list, boolean choose) {
+        for (int i = 0; i < list.size(); i++) {
+            System.out.println((i + 1) + ".\t" + list.get(i));
         }
 
         if (choose) {
-            System.out.println("Podaj numer budynku/magazynu lub 0 aby anulowac");
-            return getInteger(0, buildings.length) - 1;
+            System.out.println("Podaj numer lub 0 aby anulowac");
+            return getInteger(0, list.size()) - 1;
         }
 
         return 0;
