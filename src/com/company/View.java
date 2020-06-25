@@ -5,6 +5,9 @@ import com.company.buildings.Farm;
 import java.util.List;
 import java.util.Scanner;
 
+import static com.company.Other.theYear;
+import static com.company.Other.weekOfTheYear;
+
 public class View {
     private Scanner scanner;
 
@@ -14,20 +17,20 @@ public class View {
 
     public int mainMenu() {
         System.out.println("Menu:");
-        System.out.println("1. Zakup farmy.\n2. Zakup ziemi uprawnej.\n3. Sprzedaz ziemi uprawnej.\n" +
-                "4. Zakup budynkow.\n5. Zakup zwierzat.\n6. Zakup roslin.\n7. Posadzenie roslin.\n" +
-                "8. Zbiory roslin.\n9. Sprzedaz roslin.\n10. Sprzedaz zwierzat.\n11. Sprawdzenie stanu zapasow.\n" +
-                "12. Przejrzenie informacji o posiadanych zwierzetach.\n13. Przejrzenie informacji o zasadzonych " +
-                "roslinach.\n0. Zakonczenie tygodnia");
+        System.out.println("1.  Zakup farmy.\n2.  Zakup ziemi uprawnej.\n3.  Sprzedaz ziemi uprawnej.\n" +
+                "4.  Zakup budynkow.\n5.  Zakup zwierzat lub roslin.\n6.  Posadzenie roslin.\n" +
+                "7.  Zbiory roslin.\n8.  Sprzedaz zwierzat lub roslin.\n9.  Sprawdzenie stanu zapasow.\n" +
+                "10. Szczegoly gospodarstwa.\n0.  Zakonczenie tygodnia.");
 
         return scanner.nextInt();
     }
 
     public void printGameInfo(int week, Player player) {
-        System.out.println("---------------------------------------------");
-        System.out.println("Tydzien " + week + "                        " + player.getCash() + " zl");
-        System.out.println("                         Posiadane farmy: " + player.getFarmList().size());
-        System.out.println("---------------------------------------------");
+        System.out.println("-------------------------------------------------------");
+        System.out.println("Calkowita liczba tygodni: " + week + "                " + player.getCash() + " zl");
+        System.out.println("Tydzien " + weekOfTheYear(week) + " roku " + theYear(week) +
+                "                 Posiadane farmy: " + player.getFarmList().size());
+        System.out.println("-------------------------------------------------------");
     }
 
     public void printFarms(List<Farm> farms) {

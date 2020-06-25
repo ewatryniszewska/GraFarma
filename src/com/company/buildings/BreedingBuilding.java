@@ -1,7 +1,8 @@
 package com.company.buildings;
 
-import com.company.Config.AnimalsSpecies;
 import com.company.items.Animal;
+import com.company.items.AnimalsSpecies;
+import com.company.items.Species;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,14 +22,27 @@ public class BreedingBuilding extends Building {
         return maxNumberOfAnimals - animalList.size();
     }
 
-    public void addAnimals(AnimalsSpecies as, int number) {
-        for (int i = 0; i < number; i++) {
-            animalList.add(new Animal(as));
+    @Override
+    public void addItems(Species species, int numberOfItems) throws Exception {
+        if (!(species instanceof AnimalsSpecies)) {
+            throw new Exception("Ten budynek moze przechowywac jedynie zwierzeta!");
+        }
+
+        for (int i = 0; i < numberOfItems; i++) {
+            animalList.add(new Animal((AnimalsSpecies) species));
         }
     }
 
     @Override
     public String toString() {
         return name + ";\t" + price + " zl;\t" + maxNumberOfAnimals + " max szt. zwierzat";
+    }
+
+    @Override
+    public String detailsToString() {
+        String str = toString();
+        str += "\nObecnie w budynku znajduje się " + animalList.size() + " zwierzat.\n";
+        str += "Pozostalo do wykorzystania " + getLeftSpace() + " miejsc.";
+        return str;
     }
 }

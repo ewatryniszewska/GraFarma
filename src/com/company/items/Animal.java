@@ -1,7 +1,5 @@
 package com.company.items;
 
-import com.company.Config.AnimalsSpecies;
-
 public class Animal {
     protected AnimalsSpecies animalType;
     protected int age;

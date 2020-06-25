@@ -1,5 +1,8 @@
 package com.company.buildings;
 
+import com.company.items.Field;
+import com.company.items.PlantsSpecies;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -7,10 +10,12 @@ import static com.company.Config.HECTARE_PRICE;
 
 public class Farm {
     private List<Building> buildings;
+    private List<Field> fields;
     private int landArea;
 
     public Farm(int landArea) {
         buildings = new ArrayList<>();
+        fields = new ArrayList<>();
         this.landArea = landArea;
     }
 
@@ -28,11 +33,11 @@ public class Farm {
         return breedingBuildings;
     }
 
-    public List<Building> getWarehouses() {
-        List<Building> warehouses = new ArrayList<>();
+    public List<Warehouse> getWarehouses() {
+        List<Warehouse> warehouses = new ArrayList<>();
         for (Building building : buildings) {
             if (building instanceof Warehouse) {
-                warehouses.add(building);
+                warehouses.add((Warehouse) building);
             }
         }
         return warehouses;
@@ -58,14 +63,19 @@ public class Farm {
         landArea -= subtractLand;
     }
 
-    public String toString() {
-        StringBuilder farmStr = new StringBuilder();
-        farmStr.append("Całkowita wartość farmy: ").append(farmValue()).append(" zl \n");
-        for (Building building : getBuildings()) {
-            farmStr.append(building).append("\n");
+    public int getFreeLandArea() {
+        int currentOccupation = 0;
+        for (Field field : fields) {
+            currentOccupation += field.getNumberOfHectares();
         }
-        farmStr.append("Powierzchnia ziemi uprawnej: ").append(getLandArea()).append(" ha");
-        return farmStr.toString();
+        return landArea - currentOccupation;
+    }
+
+    public void sow(PlantsSpecies plantType, int numberOfHectares) throws Exception {
+        if (numberOfHectares > landArea) {
+            throw new Exception("Chcesz za duzo zasadzic");
+        }
+        fields.add(new Field(plantType, numberOfHectares));
     }
 
     public int farmValue() {
@@ -80,5 +90,15 @@ public class Farm {
         value += getLandArea() * HECTARE_PRICE;
 
         return value;
+    }
+
+    public String toString() {
+        StringBuilder farmStr = new StringBuilder();
+        farmStr.append("Całkowita wartość farmy: ").append(farmValue()).append(" zl \n");
+        for (Building building : getBuildings()) {
+            farmStr.append(building).append("\n");
+        }
+        farmStr.append("Powierzchnia ziemi uprawnej: ").append(getLandArea()).append(" ha");
+        return farmStr.toString();
     }
 }
