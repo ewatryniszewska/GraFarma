@@ -13,6 +13,27 @@ public class Field {
         this.numberOfCrops = plantType.numberOfCrops;
     }
 
+    public PlantsSpecies getPlantType() {
+        return plantType;
+    }
+
+    public int getAge() {
+        return age;
+    }
+
+    public void makeOlder() {
+        age++;
+    }
+
+    public int getNumberOfCrops() {
+        return numberOfCrops;
+    }
+
+    public void crop() {
+        age = 0;
+        numberOfCrops--;
+    }
+
     public int getNumberOfHectares() {
         return numberOfHectares;
     }

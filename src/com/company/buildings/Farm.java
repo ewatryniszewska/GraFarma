@@ -51,6 +51,10 @@ public class Farm {
         buildings.remove(index);
     }
 
+    public List<Field> getFields() {
+        return fields;
+    }
+
     public int getLandArea() {
         return landArea;
     }
@@ -76,6 +80,13 @@ public class Farm {
             throw new Exception("Chcesz za duzo zasadzic");
         }
         fields.add(new Field(plantType, numberOfHectares));
+    }
+
+    public void crop(Field fieldToCrop) {
+        fieldToCrop.crop();
+        if (fieldToCrop.getNumberOfCrops() == 0) {
+            fields.remove(fieldToCrop);
+        }
     }
 
     public int farmValue() {

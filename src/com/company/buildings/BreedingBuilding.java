@@ -22,6 +22,10 @@ public class BreedingBuilding extends Building {
         return maxNumberOfAnimals - animalList.size();
     }
 
+    public List<Animal> getAnimalList() {
+        return animalList;
+    }
+
     @Override
     public void addItems(Species species, int numberOfItems) throws Exception {
         if (!(species instanceof AnimalsSpecies)) {

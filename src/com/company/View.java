@@ -19,8 +19,9 @@ public class View {
         System.out.println("Menu:");
         System.out.println("1.  Zakup farmy.\n2.  Zakup ziemi uprawnej.\n3.  Sprzedaz ziemi uprawnej.\n" +
                 "4.  Zakup budynkow.\n5.  Zakup zwierzat lub roslin.\n6.  Posadzenie roslin.\n" +
-                "7.  Zbiory roslin.\n8.  Sprzedaz zwierzat lub roslin.\n9.  Sprawdzenie stanu zapasow.\n" +
-                "10. Szczegoly gospodarstwa.\n0.  Zakonczenie tygodnia.");
+                "7.  Zbiory roslin.\n8.  Sprzedaz zwierzat lub roslin.\n9.  Sprawdzenie stanu zapasow (magazyny).\n" +
+                "10. Sprawdzenie stanu pol uprawnych.\n" +
+                "11. Sprawdzenie stanu zwierząt (budynki hodowlane).\n0.  Zakonczenie tygodnia.");
 
         return scanner.nextInt();
     }

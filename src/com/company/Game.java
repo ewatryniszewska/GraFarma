@@ -4,10 +4,7 @@ import com.company.buildings.BreedingBuilding;
 import com.company.buildings.Building;
 import com.company.buildings.Farm;
 import com.company.buildings.Warehouse;
-import com.company.items.AnimalsSpecies;
-import com.company.items.Container;
-import com.company.items.PlantsSpecies;
-import com.company.items.Species;
+import com.company.items.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -183,24 +180,26 @@ public class Game {
                 case 6:
                     System.out.println("Wybierz farme na ktorej chcesz posadzic rosliny:");
 
-                    List<Farm> farmWithSpace = new ArrayList<>();
+                    List<Farm> farmsWithSpace = new ArrayList<>();
                     for (Farm farm : player.getFarmList()) {
                         if (farm.getFreeLandArea() > 0) {
-                            farmWithSpace.add(farm);
+                            farmsWithSpace.add(farm);
                         }
                     }
 
-                    if (farmWithSpace.size() == 0) {
+                    if (farmsWithSpace.size() == 0) {
                         System.out.println("Nie posiadasz farmy z wolnym miejscem do posadzenia.");
+                        break;
                     }
 
-                    selectedOption = view.printFarms(farmWithSpace, true);
+                    selectedOption = view.printFarms(farmsWithSpace, true);
                     if (selectedOption < 0) {
                         break;
                     }
 
                     System.out.println("Wybierz magazyn, z ktorego chcesz wybrac rosliny:");
-                    List<Warehouse> warehouses = player.getFarmList().get(selectedOption).getWarehouses();
+                    List<Warehouse> warehouses =
+                            player.getFarmList().get(selectedOption).getWarehouses();
                     numberOfBuilding = view.printList(warehouses, true);
                     if (numberOfBuilding < 0) {
                         break;
@@ -253,7 +252,78 @@ public class Game {
 
                     break;
                 case 7:
-                    System.out.println("Wybrano 7");
+                    System.out.println("Wybierz farme, z ktorej chcesz zebrac plony:");
+
+                    List<Farm> farmWithCrops = new ArrayList<>();
+                    for (Farm farm : player.getFarmList()) {
+                        if (farm.getFields().size() > 0) {
+                            farmWithCrops.add(farm);
+                        }
+                    }
+
+                    if (farmWithCrops.size() == 0) {
+                        System.out.println("Nie posiadasz zasianych roslin.");
+                        break;
+                    }
+
+                    selectedOption = view.printFarms(farmWithCrops, true);
+                    if (selectedOption < 0) {
+                        break;
+                    }
+
+                    List<Field> fields = new ArrayList<>();
+                    for (Field field : player.getFarmList().get(selectedOption).getFields()) {
+                        if (field.getAge() >= field.getPlantType().minCropWeek &&
+                                field.getAge() <= field.getPlantType().maxCropWeek) {
+                            fields.add(field);
+                        }
+                    }
+
+                    if (fields.size() == 0) {
+                        System.out.println("Brak roslin do zebrania.");
+                        break;
+                    }
+
+                    System.out.println("Wybierz pole, z ktorego chcesz zebrac plony:");
+                    itemChoice = view.printList(fields, true);
+                    if (itemChoice < 0) {
+                        break;
+                    }
+
+                    Field field = fields.get(itemChoice);
+                    int cropCost = field.getPlantType().cropCost * field.getNumberOfHectares();
+
+                    if (cropCost > player.getCash()) {
+                        System.out.println("Koszt zbioru (" + cropCost + " zl) jest za wysoki.");
+                        break;
+                    }
+
+                    List<Warehouse> warehousesWithSpace = new ArrayList<>();
+                    for (Warehouse warehouse : player.getFarmList().get(selectedOption).getWarehouses()) {
+                        if (warehouse.getLeftSpace() >= field.getPlantType().cropYield) {
+                            warehousesWithSpace.add(warehouse);
+                        }
+                    }
+
+                    if (warehousesWithSpace.size() == 0) {
+                        System.out.println("Zaden z magazynow na tej farmie nie ma wystarczajaco duzo miejsca.");
+                        break;
+                    }
+
+                    System.out.println("Wybierz magazyn, w ktorym bedziesz przechowywac zebrane plony:");
+                    numberOfBuilding = view.printList(warehousesWithSpace, true);
+                    if (numberOfBuilding < 0) {
+                        break;
+                    }
+
+                    try {
+                        warehousesWithSpace.get(numberOfBuilding).addItems(field.getPlantType(), cropCost);
+                        player.getFarmList().get(selectedOption).crop(field);
+                        System.out.println("Zebrano plony.");
+                    } catch (Exception e) {
+                        System.out.println(e.toString());
+                    }
+
                     break;
                 case 8:
                     System.out.println("Wybrano 8");
@@ -274,7 +344,28 @@ public class Game {
                     System.out.println("Wybrano 13");
                     break;
                 case 0:
+                    // zwiekszenie tygodnia
                     week++;
+                    // obsluga zwierzat i roslin
+                    for (Farm farm : player.getFarmList()) {
+                        // zwierzeta
+                        for (BreedingBuilding bb : farm.getBreedingBuildings()) {
+                            for (Animal animal : bb.getAnimalList()) {
+                                animal.makeOlder();
+                                if (animal.getAge() > animal.getAnimalType().maxAge) {
+                                    bb.getAnimalList().remove(animal);
+                                }
+                            }
+                        }
+                        // rosliny
+                        for (Field f : farm.getFields()) {
+                            f.makeOlder();
+                            // pole obumiera
+                            if (f.getAge() > f.getPlantType().maxCropWeek) {
+                                farm.getFields().remove(f);
+                            }
+                        }
+                    }
                     break;
             }
         }

@@ -11,6 +11,18 @@ public class Animal {
         this.weight = animalType.minWeight;
     }
 
+    public AnimalsSpecies getAnimalType() {
+        return animalType;
+    }
+
+    public int getAge() {
+        return age;
+    }
+
+    public void makeOlder() {
+        age++;
+    }
+
     public String toString() {
         return animalType.speciesName + "; " + age + " tyg; " + weight + " kg; ";
     }
