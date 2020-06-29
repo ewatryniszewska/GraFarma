@@ -2,10 +2,13 @@ package com.company.buildings;
 
 import com.company.items.Animal;
 import com.company.items.AnimalsSpecies;
+import com.company.items.AnimalsSummary;
 import com.company.items.Species;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class BreedingBuilding extends Building {
     private int maxNumberOfAnimals;
@@ -34,6 +37,50 @@ public class BreedingBuilding extends Building {
 
         for (int i = 0; i < numberOfItems; i++) {
             animalList.add(new Animal((AnimalsSpecies) species));
+        }
+    }
+
+    public Map<AnimalsSpecies, AnimalsSummary> getAnimalsSummary() {
+        Map<AnimalsSpecies, AnimalsSummary> map = new HashMap<>();
+        for (Animal animal : animalList) {
+            AnimalsSummary as = map.getOrDefault(animal.getAnimalType(), new AnimalsSummary());
+            if (animal.getAge() >= animal.getAnimalType().maturityAge) {
+                as.matureSum++;
+            } else if (animal.getAge() >= animal.getAnimalType().minSellAge) {
+                as.immatureSum++;
+            } else {
+                as.toYoungSum++;
+            }
+
+            if (animal.getAge() > as.maxAge) {
+                as.maxAge = animal.getAge();
+            }
+
+            if (animal.getAge() < as.minAge) {
+                as.minAge = animal.getAge();
+            }
+            map.put(animal.getAnimalType(), as);
+        }
+        return map;
+    }
+
+    public void subtractAnimals(int numberOfItems, boolean mature) {
+        List<Animal> animalsToRemove = new ArrayList<>();
+        for (Animal animal : getAnimalList()) {
+            if (numberOfItems == 0) {
+                break;
+            }
+
+            if ((mature && animal.getAge() >= animal.getAnimalType().maturityAge) ||
+                    (!mature && animal.getAge() >= animal.getAnimalType().minSellAge
+                            && animal.getAge() < animal.getAnimalType().maturityAge)) {
+                animalsToRemove.add(animal);
+                numberOfItems--;
+            }
+        }
+
+        for (Animal animal : animalsToRemove) {
+            getAnimalList().remove(animal);
         }
     }
 

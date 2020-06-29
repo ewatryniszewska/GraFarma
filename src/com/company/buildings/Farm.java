@@ -112,4 +112,11 @@ public class Farm {
         farmStr.append("Powierzchnia ziemi uprawnej: ").append(getLandArea()).append(" ha");
         return farmStr.toString();
     }
+
+    public String detailsToString() {
+        String str = toString();
+        str += "\nCalkowita powierzchnia ziemi uprawnej: " + getLandArea() + " ha\n";
+        str += "Wolne miejsce pod zasiew: " + getFreeLandArea() + " ha\n";
+        return str;
+    }
 }

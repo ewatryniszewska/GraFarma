@@ -6,10 +6,7 @@ import com.company.buildings.Farm;
 import com.company.buildings.Warehouse;
 import com.company.items.*;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Scanner;
+import java.util.*;
 
 import static com.company.Config.*;
 import static com.company.Other.weekOfTheYear;
@@ -48,6 +45,8 @@ public class Game {
     protected void gameOn() {
         View view = new View();
         int selectedOption, numberOfBuilding, itemChoice, numberOfItems;
+        List<Building> bl;
+        Building building;
 
         while (true) {
             view.printGameInfo(week, player);
@@ -129,13 +128,13 @@ public class Game {
                     }
 
                     System.out.println("Wybierz budynek, do ktorego chcesz kupic zwierzeta lub rosliny:");
-                    List<Building> bl = player.getFarmList().get(selectedOption).getBuildings();
+                    bl = player.getFarmList().get(selectedOption).getBuildings();
                     numberOfBuilding = view.printList(bl, true);
                     if (numberOfBuilding < 0) {
                         break;
                     }
 
-                    Building building = bl.get(numberOfBuilding);
+                    building = bl.get(numberOfBuilding);
                     if (building.getLeftSpace() <= 0) {
                         System.out.println("W wybranym budynku nie ma już miejsca");
                         break;
@@ -198,14 +197,23 @@ public class Game {
                     }
 
                     System.out.println("Wybierz magazyn, z ktorego chcesz wybrac rosliny:");
-                    List<Warehouse> warehouses =
-                            player.getFarmList().get(selectedOption).getWarehouses();
+                    List<Warehouse> warehouses = new ArrayList<>();
+                    for (Warehouse warehouse : player.getFarmList().get(selectedOption).getWarehouses()) {
+                        if (warehouse.getContainers().size() != 0) {
+                            warehouses.add(warehouse);
+                        }
+                    }
+
+                    if (warehouses.size() == 0) {
+                        System.out.println("Wybrany magazyn nie posiada zapasow.");
+                        break;
+                    }
+
                     numberOfBuilding = view.printList(warehouses, true);
                     if (numberOfBuilding < 0) {
                         break;
                     }
 
-                    System.out.println("Wybierz rosline ktora chcesz zasadzic:");
                     List<Container> containers = new ArrayList<>();
                     for (Container container : warehouses.get(numberOfBuilding).getContainers()) {
                         if (container.getPlantType().canBePlanted &&
@@ -220,6 +228,7 @@ public class Game {
                         break;
                     }
 
+                    System.out.println("Wybierz rosline ktora chcesz zasadzic:");
                     itemChoice = view.printList(containers, true);
                     if (itemChoice < 0) {
                         break;
@@ -298,9 +307,11 @@ public class Game {
                         break;
                     }
 
+                    int cropSize = field.getPlantType().cropYield * field.getNumberOfHectares();
+
                     List<Warehouse> warehousesWithSpace = new ArrayList<>();
                     for (Warehouse warehouse : player.getFarmList().get(selectedOption).getWarehouses()) {
-                        if (warehouse.getLeftSpace() >= field.getPlantType().cropYield) {
+                        if (warehouse.getLeftSpace() >= cropSize) {
                             warehousesWithSpace.add(warehouse);
                         }
                     }
@@ -317,8 +328,9 @@ public class Game {
                     }
 
                     try {
-                        warehousesWithSpace.get(numberOfBuilding).addItems(field.getPlantType(), cropCost);
+                        warehousesWithSpace.get(numberOfBuilding).addItems(field.getPlantType(), cropSize);
                         player.getFarmList().get(selectedOption).crop(field);
+                        player.subtractCash(cropCost);
                         System.out.println("Zebrano plony.");
                     } catch (Exception e) {
                         System.out.println(e.toString());
@@ -326,22 +338,168 @@ public class Game {
 
                     break;
                 case 8:
-                    System.out.println("Wybrano 8");
+                    if (player.getFarmList().size() == 0) {
+                        System.out.println("Nie posiadasz farm.");
+                        break;
+                    }
+
+                    System.out.println("Wybierz farme, z ktorej chcesz sprzedac zwierzeta lub rosliny:");
+                    selectedOption = view.printFarms(player.getFarmList(), true);
+                    if (selectedOption < 0) {
+                        break;
+                    }
+
+                    System.out.println("Wybierz budynek, z ktorego chcesz sprzedac zwierzeta lub rosliny:");
+                    bl = player.getFarmList().get(selectedOption).getBuildings();
+                    numberOfBuilding = view.printList(bl, true);
+                    if (numberOfBuilding < 0) {
+                        break;
+                    }
+
+                    if (bl.get(numberOfBuilding) instanceof BreedingBuilding) {
+                        BreedingBuilding bb = (BreedingBuilding) bl.get(numberOfBuilding);
+                        Map<AnimalsSpecies, AnimalsSummary> sm = bb.getAnimalsSummary();
+
+                        if (sm.size() == 0) {
+                            System.out.println("Brak zwierzat na sprzedaz w wybranym budynku hodowlanym.");
+                            break;
+                        }
+
+                        System.out.println("Wybierz zwierzeta na sprzedaz:");
+                        AnimalsSpecies animalChoice = view.printAnimalsSummary(sm, true);
+                        if (animalChoice == null) {
+                            break;
+                        }
+
+                        System.out.println("Wybierz czy chcesz sprzedac mlode (1) czy dojrzale (2) osobniki " +
+                                "(0 aby zrezygnowac):");
+                        selectedOption = view.getInteger(0, 2);
+
+                        if (selectedOption == 0) {
+                            break;
+                        }
+
+                        System.out.println("Ile sztuk chcesz sprzedac?");
+                        numberOfItems = view.getInteger(0, selectedOption == 1
+                                ? sm.get(animalChoice).immatureSum : sm.get(animalChoice).matureSum);
+
+                        bb.subtractAnimals(numberOfItems, selectedOption == 2);
+                        int money = numberOfItems *
+                                (selectedOption == 1 ? animalChoice.immaturePrice : animalChoice.maturePrice);
+                        player.addCash(money);
+
+                        System.out.println("Sprzedales " + numberOfItems + " sztuk za " + money + " zl.");
+                    } else {
+                        Warehouse warehouse = (Warehouse) bl.get(numberOfBuilding);
+                        if (warehouse.getContainers().size() == 0) {
+                            System.out.println("Brak roślin na sprzedaz w wybranym magazynie.");
+                            break;
+                        }
+
+                        System.out.println("Wybierz rośliny na sprzedaż:");
+                        itemChoice = view.printList(warehouse.getContainers(), true);
+                        if (itemChoice < 0) {
+                            break;
+                        }
+
+                        System.out.println("Ile kikogramow chcesz sprzedac?");
+                        numberOfItems = view.getInteger(0, warehouse.getContainers().get(itemChoice).getWeight());
+
+                        warehouse.getContainers().get(itemChoice).addWeight(-numberOfItems);
+                        int money = numberOfItems * warehouse.getContainers().get(itemChoice).getPlantType().kgPrice;
+                        player.addCash(money);
+
+                        System.out.println("Sprzedano " + numberOfItems + " kg za " + money + " zl.");
+                    }
                     break;
                 case 9:
-                    System.out.println("Wybrano 9");
+                    switch (view.farmsInfoMenu()) {
+                        case 1:
+                            view.printFarms(player.getFarmList());
+                            break;
+                        case 2:
+                            List<Farm> farmsWithWarehouse = new ArrayList<>();
+                            for (Farm farm : player.getFarmList()) {
+                                if (farm.getWarehouses().size() != 0) {
+                                    farmsWithWarehouse.add(farm);
+                                }
+                            }
+
+                            if (farmsWithWarehouse.size() == 0) {
+                                System.out.println("Nie posiadasz farmy z magazynem.");
+                                break;
+                            }
+
+                            System.out.println("Wybierz farme, w której chcesz sprawdzic stan zapasow w magazynach:");
+                            selectedOption = view.printFarms(farmsWithWarehouse, true);
+                            if (selectedOption < 0) {
+                                break;
+                            }
+
+                            for (Warehouse warehouse : farmsWithWarehouse.get(selectedOption).getWarehouses()) {
+                                System.out.println(warehouse.detailsToString());
+                                if (warehouse.getContainers().size() != 0) {
+                                    System.out.println("W magazynie znajduja sie:");
+                                    view.printList(warehouse.getContainers());
+                                } else {
+                                    System.out.println("Brak roslin w magazynie.");
+                                }
+                                System.out.println();
+                            }
+                            break;
+                        case 3:
+                            if (player.getFarmList().size() == 0) {
+                                System.out.println("Nie posiadasz jeszcze zadnej farmy.");
+                                break;
+                            }
+
+                            for (Farm farm : player.getFarmList()) {
+                                System.out.println(farm.detailsToString());
+                                if (farm.getFields().size() != 0) {
+                                    System.out.println("Na farmie zasiane są:");
+                                    view.printList(farm.getFields());
+                                } else {
+                                    System.out.println("Jeszcze nic nie posadzono na tej farmie.");
+                                }
+                            }
+                            break;
+                        case 4:
+                            List<Farm> farmsWithBB = new ArrayList<>();
+                            for (Farm farm : player.getFarmList()) {
+                                if (farm.getBreedingBuildings().size() != 0) {
+                                    farmsWithBB.add(farm);
+                                }
+                            }
+
+                            if (farmsWithBB.size() == 0) {
+                                System.out.println("Nie posiadasz farmy z budynkiem hodowlanym.");
+                                break;
+                            }
+
+                            System.out.println("Wybierz farme, w której chcesz sprawdzic stan zwierzat w budynkach hodowlanych:");
+                            selectedOption = view.printFarms(farmsWithBB, true);
+                            if (selectedOption < 0) {
+                                break;
+                            }
+
+                            for (BreedingBuilding breedingBuilding : farmsWithBB.get(selectedOption).getBreedingBuildings()) {
+                                System.out.println(breedingBuilding.detailsToString());
+                                if (breedingBuilding.getAnimalList().size() != 0) {
+                                    System.out.println("W budynku hodowlanym znajduja sie:");
+                                    view.printList(breedingBuilding.getAnimalList());
+                                } else {
+                                    System.out.println("Brak zwierzat w budynku hodowlanym.");
+                                }
+                                System.out.println();
+                            }
+                            break;
+                    }
                     break;
                 case 10:
                     System.out.println("Wybrano 10");
                     break;
                 case 11:
                     System.out.println("Wybrano 11");
-                    break;
-                case 12:
-                    System.out.println("Wybrano 12");
-                    break;
-                case 13:
-                    System.out.println("Wybrano 13");
                     break;
                 case 0:
                     // zwiekszenie tygodnia
@@ -350,24 +508,37 @@ public class Game {
                     for (Farm farm : player.getFarmList()) {
                         // zwierzeta
                         for (BreedingBuilding bb : farm.getBreedingBuildings()) {
+                            List<Animal> tempDeadAnimals = new ArrayList<>();
                             for (Animal animal : bb.getAnimalList()) {
                                 animal.makeOlder();
                                 if (animal.getAge() > animal.getAnimalType().maxAge) {
-                                    bb.getAnimalList().remove(animal);
+                                    tempDeadAnimals.add(animal);
                                 }
                             }
+
+                            // zwierze umiera ze starosci
+                            for (Animal animal : tempDeadAnimals) {
+                                bb.getAnimalList().remove(animal);
+                            }
                         }
+
                         // rosliny
+                        List<Field> tempDeadFields = new ArrayList<>();
                         for (Field f : farm.getFields()) {
                             f.makeOlder();
-                            // pole obumiera
                             if (f.getAge() > f.getPlantType().maxCropWeek) {
-                                farm.getFields().remove(f);
+                                tempDeadFields.add(f);
                             }
+                        }
+
+                        // pole obumiera
+                        for (Field f : tempDeadFields) {
+                            farm.getFields().remove(f);
                         }
                     }
                     break;
             }
+            view.waitForUser();
         }
     }
 

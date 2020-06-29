@@ -69,7 +69,7 @@ public enum PlantsSpecies implements Species {
                 "  koszt posadzenia:         " + plantingCost + " zl/ha\n" +
                 "  wydajność sadzenia:       " + plantingKgPerHa + " kg/ha\n" +
                 "  koszt pestycydow:         " + pestProtectionCost + " zl/ha\n" +
-                "  wydajnosc upraw:          " + cropYield + " kg zbiorow/ha" +
+                "  wydajnosc upraw:          " + cropYield + " kg zbiorow/ha\n" +
                 "  mozliwosc obsadzania:     " + "od " + minPlantWeek + " do " + maxPlantWeek + " tygodnia roku\n" +
                 "  mozliwosc zbiorow:        " + "od " + minCropWeek + " do " + maxCropWeek + " tygodni od zasiania\n" +
                 "  koszt zbioru:             " + cropCost + " zl/ha\n" +

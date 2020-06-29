@@ -1,8 +1,12 @@
 package com.company;
 
 import com.company.buildings.Farm;
+import com.company.items.AnimalsSpecies;
+import com.company.items.AnimalsSummary;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Scanner;
 
 import static com.company.Other.theYear;
@@ -19,9 +23,17 @@ public class View {
         System.out.println("Menu:");
         System.out.println("1.  Zakup farmy.\n2.  Zakup ziemi uprawnej.\n3.  Sprzedaz ziemi uprawnej.\n" +
                 "4.  Zakup budynkow.\n5.  Zakup zwierzat lub roslin.\n6.  Posadzenie roslin.\n" +
-                "7.  Zbiory roslin.\n8.  Sprzedaz zwierzat lub roslin.\n9.  Sprawdzenie stanu zapasow (magazyny).\n" +
-                "10. Sprawdzenie stanu pol uprawnych.\n" +
-                "11. Sprawdzenie stanu zwierząt (budynki hodowlane).\n0.  Zakonczenie tygodnia.");
+                "7.  Zbiory roslin.\n8.  Sprzedaz zwierzat lub roslin.\n9.  Informacje o farmach." +
+                "\n0.  Zakonczenie tygodnia.");
+
+        return scanner.nextInt();
+    }
+
+    public int farmsInfoMenu() {
+        System.out.println("Menu:");
+        System.out.println("1.  Lista farm.\n2.  Sprawdzenie stanu zapasow (magazyny).\n" +
+                "3.  Sprawdzenie stanu pol uprawnych.\n" +
+                "4.  Sprawdzenie stanu zwierząt (budynki hodowlane).\n0.  Powrot do glownego menu.");
 
         return scanner.nextInt();
     }
@@ -39,6 +51,11 @@ public class View {
     }
 
     public int printFarms(List<Farm> farms, boolean choose) {
+        if (farms.size() == 0) {
+            System.out.println("Nie posiadasz farm.");
+            return 0;
+        }
+
         for (int i = 0; i < farms.size(); i++) {
             System.out.println("-- FARMA " + (i + 1) + " ---------\t\t\t\t cena: " + farms.get(i).farmValue() + " zl");
             System.out.println(farms.get(i) + "\n");
@@ -87,5 +104,39 @@ public class View {
         }
 
         return 0;
+    }
+
+    public AnimalsSpecies printAnimalsSummary(Map<AnimalsSpecies, AnimalsSummary> animalsSummary) {
+        return printAnimalsSummary(animalsSummary, false);
+    }
+
+    public AnimalsSpecies printAnimalsSummary(Map<AnimalsSpecies, AnimalsSummary> animalsSummary, boolean choose) {
+        List<AnimalsSpecies> tempSpecies = new ArrayList<>();
+
+        int i = 1;
+        for (AnimalsSpecies as : animalsSummary.keySet()) {
+            tempSpecies.add(as);
+            System.out.println(i + ": " + as.speciesName + ":\t" + animalsSummary.get(as));
+            i++;
+        }
+
+        if (choose) {
+            System.out.println("Podaj numer lub 0 aby anulowac");
+            i = getInteger(0, animalsSummary.size()) - 1;
+            if (i < 0) {
+                return null;
+            }
+            return tempSpecies.get(i);
+        }
+
+        return null;
+    }
+
+    public void waitForUser() {
+        System.out.println("Wcisnij enter aby przejsc dalej.");
+        try {
+            System.in.read();
+        } catch (Exception e) {
+        }
     }
 }
