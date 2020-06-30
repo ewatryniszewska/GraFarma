@@ -31,12 +31,21 @@ public class BreedingBuilding extends Building {
 
     @Override
     public void addItems(Species species, int numberOfItems) throws Exception {
+        AnimalsSpecies animal = (AnimalsSpecies) species;
+        addAnimal(species, numberOfItems, animal.minSellAge);
+    }
+
+    public void addAnimal(Species species, int numberOfItems, int age) throws Exception {
         if (!(species instanceof AnimalsSpecies)) {
             throw new Exception("Ten budynek moze przechowywac jedynie zwierzeta!");
         }
 
         for (int i = 0; i < numberOfItems; i++) {
-            animalList.add(new Animal((AnimalsSpecies) species));
+            if (getLeftSpace() > 0) {
+                animalList.add(new Animal((AnimalsSpecies) species, age));
+            } else {
+                return;
+            }
         }
     }
 

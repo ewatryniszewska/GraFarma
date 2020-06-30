@@ -140,7 +140,7 @@ public class View {
         System.out.println("  - posiadanie conajmniej 20ha ziemi uprawnej");
         System.out.println("  - posiadanie conajmniej 5 roznych gatunkow zwierzat");
         System.out.println("  - posiadanie conajmniej 5 roznych posadzonych gatunkow roslin");
-        System.out.println("  - jedzenie dla wszystkich zwierzat na rok");
+        System.out.println("  - posiadanie 1 milion zl na koncie");
         System.out.println();
         System.out.println("Pieniadze zarabiac mozesz:");
         System.out.println("  - hodujac, a nastepnie sprzedajac zwierzeta lub ich produkty");

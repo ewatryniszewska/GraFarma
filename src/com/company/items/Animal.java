@@ -5,9 +5,9 @@ public class Animal {
     protected int age;
     protected int weight;
 
-    public Animal(AnimalsSpecies animalType) {
+    public Animal(AnimalsSpecies animalType, int age) {
         this.animalType = animalType;
-        this.age = animalType.minSellAge;
+        this.age = age;
         this.weight = animalType.minWeight;
     }
 
@@ -19,8 +19,24 @@ public class Animal {
         return age;
     }
 
-    public void makeOlder() {
+    public boolean makeOlder() {
         age++;
+        return getAge() <= getAnimalType().maxAge;
+    }
+
+    public boolean loseWeight() {
+        int w = weight - animalType.weightGainPerWeek;
+        if (w < animalType.minWeight) {
+            return false;
+        } else {
+            weight = w;
+            return true;
+        }
+    }
+
+    public void gainWeight() {
+        int w = weight + animalType.weightGainPerWeek;
+        weight = Math.min(w, animalType.maxWeight);
     }
 
     public String toString() {

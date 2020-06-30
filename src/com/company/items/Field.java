@@ -21,8 +21,9 @@ public class Field {
         return age;
     }
 
-    public void makeOlder() {
+    public boolean makeOlder() {
         age++;
+        return getAge() <= getPlantType().maxCropWeek;
     }
 
     public int getNumberOfCrops() {

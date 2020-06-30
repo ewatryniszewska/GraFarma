@@ -16,7 +16,9 @@ public class AnimalsSummary {
     }
 
     public String toString() {
-        return "Dojrzalych: " + matureSum + "; Niedojrzalych: " + immatureSum + "; Za mlode na sprzedaz: " +
-                toYoungSum + "\t| min/max wiek: " + minAge + "/" + maxAge;
+        return "Dojrzalych:                   " + matureSum +
+                "\nNiedojrzalych:                " + immatureSum +
+                "\nZa mlode na sprzedaz:         " + toYoungSum +
+                "\nMinimalny / Maksymalny wiek:  " + minAge + "/" + maxAge;
     }
 }

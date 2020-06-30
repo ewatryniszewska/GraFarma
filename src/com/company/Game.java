@@ -20,7 +20,7 @@ public class Game {
     private Generator generator;
 
     public Game() {
-        player = new Player(5000000);
+        player = new Player(250000);
         week = 1;
         generator = new Generator();
 
@@ -35,10 +35,9 @@ public class Game {
 
         if (answer.equals("tak")) {
             gameOn();
-        } else if (answer.equals("nie")) {
-            System.out.println("cos");
-        } else {
-            System.out.println("Niepoprawne dane, sproboj ponownie.");
+        } else if (answer.equals("motherlode")) {
+            player.addCash(5000000);
+            gameOn();
         }
     }
 
@@ -48,7 +47,7 @@ public class Game {
         List<Building> bl;
         Building building;
 
-        while (true) {
+        while (player.getGameIsOn()) {
             view.printGameInfo(week, player);
             switch (view.mainMenu()) {
                 case 1:
@@ -317,19 +316,39 @@ public class Game {
                         }
                     }
 
+                    boolean sell = false;
+
                     if (warehousesWithSpace.size() == 0) {
                         System.out.println("Zaden z magazynow na tej farmie nie ma wystarczajaco duzo miejsca.");
-                        break;
+                        System.out.println("Czy chcesz natychmiast sprzedac plony (1) czy anulowac zbior (0)?");
+                        if (view.getInteger(0, 1) == 0) {
+                            break;
+                        }
+                        sell = true;
                     }
 
-                    System.out.println("Wybierz magazyn, w ktorym bedziesz przechowywac zebrane plony:");
-                    numberOfBuilding = view.printList(warehousesWithSpace, true);
-                    if (numberOfBuilding < 0) {
-                        break;
+                    if (!sell) {
+                        System.out.println("Czy chcesz natychmiast sprzedac plony (1) czy przechowac w magazynie (2) / (0 aby anulowac)?");
+                        int sellOption = view.getInteger(0, 2);
+                        if (sellOption == 0) {
+                            break;
+                        }
+
+                        sell = sellOption == 1;
                     }
 
                     try {
-                        warehousesWithSpace.get(numberOfBuilding).addItems(getCropType(field.getPlantType()), cropSize);
+                        if (!sell) {
+                            System.out.println("Wybierz magazyn, w ktorym bedziesz przechowywac zebrane plony:");
+                            numberOfBuilding = view.printList(warehousesWithSpace, true);
+                            if (numberOfBuilding < 0) {
+                                break;
+                            }
+
+                            warehousesWithSpace.get(numberOfBuilding).addItems(getCropType(field.getPlantType()), cropSize);
+                        } else {
+                            player.addCash(getCropType(field.getPlantType()).unitPrice * cropSize);
+                        }
                         player.getFarmList().get(selectedOption).crop(field);
                         player.subtractCash(cropCost);
                         System.out.println("Zebrano plony.");
@@ -489,7 +508,12 @@ public class Game {
                                 System.out.println(breedingBuilding.detailsToString());
                                 if (breedingBuilding.getAnimalList().size() != 0) {
                                     System.out.println("W budynku hodowlanym znajduja sie:");
-                                    view.printList(breedingBuilding.getAnimalList());
+                                    Map<AnimalsSpecies, AnimalsSummary> summary = breedingBuilding.getAnimalsSummary();
+                                    for (AnimalsSpecies as : summary.keySet()) {
+                                        System.out.println("Zwierzeta gatunku " + as.speciesName + ":");
+                                        System.out.println(summary.get(as));
+                                        System.out.println();
+                                    }
                                 } else {
                                     System.out.println("Brak zwierzat w budynku hodowlanym.");
                                 }
@@ -502,40 +526,151 @@ public class Game {
                     view.printRules();
                     break;
                 case 0:
-                    // zwiekszenie tygodnia
-                    week++;
+                    // dane do podsumowania
+                    int deadAnimals = 0;
+                    int deadFields = 0;
+                    int eatenFodder = 0;
+                    int bornAnimals = 0;
+                    int pesticidesCost = 0;
+                    int productionGain = 0;
+                    int farmsHaSum = 0;
+                    Set<AnimalsSpecies> uniqueAnimals = new HashSet<>();
+                    Set<PlantsSpecies> uniquePlants = new HashSet<>();
+
                     // obsluga zwierzat i roslin
                     for (Farm farm : player.getFarmList()) {
+                        // farma
+                        farmsHaSum += farm.getLandArea();
+
                         // zwierzeta
                         for (BreedingBuilding bb : farm.getBreedingBuildings()) {
                             List<Animal> tempDeadAnimals = new ArrayList<>();
                             for (Animal animal : bb.getAnimalList()) {
-                                animal.makeOlder();
-                                if (animal.getAge() > animal.getAnimalType().maxAge) {
+                                // unikalne zwierzeta
+                                uniqueAnimals.add(animal.getAnimalType());
+
+                                // starzenie
+                                if (!animal.makeOlder()) {
                                     tempDeadAnimals.add(animal);
+                                }
+
+                                // jedzenie
+                                int howMuchToEat = animal.getAnimalType().fodderPerWeek;
+                                for (PlantsSpecies ps : animal.getAnimalType().plantsEaten) {
+                                    howMuchToEat = farm.feed(ps, howMuchToEat);
+                                }
+
+                                eatenFodder += animal.getAnimalType().fodderPerWeek - howMuchToEat;
+
+                                // czy zwierze chudnie, czy umiera, czy tyje
+                                if (howMuchToEat > 0) {
+                                    if (!animal.loseWeight()) {
+                                        tempDeadAnimals.add(animal);
+                                    }
+                                } else {
+                                    animal.gainWeight();
                                 }
                             }
 
-                            // zwierze umiera ze starosci
+                            // zwierze umiera
+                            deadAnimals += tempDeadAnimals.size();
                             for (Animal animal : tempDeadAnimals) {
                                 bb.getAnimalList().remove(animal);
                             }
+
+                            Map<AnimalsSpecies, AnimalsSummary> summary = bb.getAnimalsSummary();
+                            for (AnimalsSpecies as : summary.keySet()) {
+                                // rozmnazanie
+                                double p = as.breedingChance;
+                                int x = summary.get(as).matureSum;
+                                double expected = (1 - Math.pow(1 - p, x)) * x;
+                                Random r = new Random();
+                                int born = Math.max((int) Math.round(r.nextGaussian() + expected), 0);
+                                if (summary.get(as).matureSum >= 2) {
+                                    try {
+                                        bb.addAnimal(as, born, 0);
+                                        bornAnimals = born;
+                                    } catch (Exception e) {
+                                        e.printStackTrace();
+                                    }
+                                }
+
+                                // jaja lub mleko
+                                if (as.productSellPrice > 0) {
+                                    productionGain += summary.get(as).matureSum * as.productSellPrice * as.productionPerWeek;
+                                    player.addCash(summary.get(as).matureSum * as.productSellPrice * as.productionPerWeek);
+                                }
+                            }
+
+
                         }
 
                         // rosliny
                         List<Field> tempDeadFields = new ArrayList<>();
                         for (Field f : farm.getFields()) {
-                            f.makeOlder();
-                            if (f.getAge() > f.getPlantType().maxCropWeek) {
+                            // unikalne zasiane rosliny
+                            uniquePlants.add(f.getPlantType());
+
+                            // rosna
+                            if (!f.makeOlder()) {
                                 tempDeadFields.add(f);
+                            }
+
+                            // ochrona roslin
+                            if (player.getCash() < f.getPlantType().pestProtectionCost * f.getNumberOfHectares()) {
+                                double death = Math.random();
+                                if (death < 0.1) {
+                                    tempDeadFields.add(f);
+                                }
+                            } else {
+                                pesticidesCost += f.getPlantType().pestProtectionCost * f.getNumberOfHectares();
+                                player.subtractCash(f.getPlantType().pestProtectionCost * f.getNumberOfHectares());
                             }
                         }
 
                         // pole obumiera
+                        deadFields += tempDeadFields.size();
                         for (Field f : tempDeadFields) {
                             farm.getFields().remove(f);
                         }
                     }
+
+                    System.out.println("Podsumowanie tygodnia " + week + ": ");
+                    System.out.println("-------------------------------------------------------------");
+                    System.out.println("Zdechlo:                            " + deadAnimals + " szt. zwierzat");
+                    System.out.println("Obumarlo                            " + deadFields + " pol uprawnych");
+                    System.out.println("Zwierzeta zjadly:                   " + eatenFodder + " kg paszy");
+                    System.out.println("Urodzilo sie:                       " + bornAnimals + " szt. zwierzat");
+                    System.out.println("Na pestycydy wydano:                " + pesticidesCost + " zl");
+                    System.out.println("Zwierzeta wyprodukowaly towary za:  " + productionGain + " zl");
+                    System.out.println("-------------------------------------------------------------");
+                    System.out.println("Bilans tygodnia:                    " + (productionGain - pesticidesCost) + " zl");
+
+                    System.out.println();
+                    System.out.println("Warunki super farmera: ");
+                    System.out.println("20 ha ziem:                    " + (farmsHaSum >= 20 ? "SPELNIONO" : "NIE SPELNIONO") + " (" + farmsHaSum + "/20)");
+                    System.out.println("5 gatunkow zwierzat:           " + (uniqueAnimals.size() >= 5 ? "SPELNIONO" : "NIE SPELNIONO") + " (" + uniqueAnimals.size() + "/5)");
+                    System.out.println("5 gatunkow roslin:             " + (uniquePlants.size() >= 5 ? "SPELNIONO" : "NIE SPELNIONO") + " (" + uniquePlants.size() + "/5)");
+                    System.out.println("1 000 000 zl na koncie:        " + (player.getCash() >= 1000000 ? "SPELNIONO" : "NIE SPELNIONO") + " (" + player.getCash() + "/1000000)");
+
+                    if (farmsHaSum >= 20 && uniqueAnimals.size() >= 5 && uniquePlants.size() >= 5 && player.getCash() >= 1000000) {
+                        System.out.println();
+                        System.out.println("     ___  _______  _______  _______  _______  _______    _______  __   __  _______  _______  ______      _______  _______  ______    __   __  _______  ______    _______  __   __ ");
+                        System.out.println("    |   ||       ||       ||       ||       ||       |  |       ||  | |  ||       ||       ||    _ |    |       ||   _   ||    _ |  |  |_|  ||       ||    _ |  |       ||  |_|  |");
+                        System.out.println("    |   ||    ___||  _____||_     _||    ___||  _____|  |  _____||  | |  ||    _  ||    ___||   | ||    |    ___||  |_|  ||   | ||  |       ||    ___||   | ||  |    ___||       |");
+                        System.out.println("    |   ||   |___ | |_____   |   |  |   |___ | |_____   | |_____ |  |_|  ||   |_| ||   |___ |   |_||_   |   |___ |       ||   |_||_ |       ||   |___ |   |_||_ |   |___ |       |");
+                        System.out.println(" ___|   ||    ___||_____  |  |   |  |    ___||_____  |  |_____  ||       ||    ___||    ___||    __  |  |    ___||       ||    __  ||       ||    ___||    __  ||    ___||       |");
+                        System.out.println("|       ||   |___  _____| |  |   |  |   |___  _____| |   _____| ||       ||   |    |   |___ |   |  | |  |   |    |   _   ||   |  | || ||_|| ||   |___ |   |  | ||   |___ | ||_|| |");
+                        System.out.println("|_______||_______||_______|  |___|  |_______||_______|  |_______||_______||___|    |_______||___|  |_|  |___|    |__| |__||___|  |_||_|   |_||_______||___|  |_||_______||_|   |_|");
+                        System.out.println();
+                        System.out.println("Jezeli chcesz zakonczyc gre wpisz 1, aby kontynuowac wpisz 0.");
+                        if (view.getInteger(0, 1) == 1) {
+                            player.endGame();
+                        }
+                    }
+
+                    // zwiekszenie tygodnia
+                    week++;
                     break;
             }
             view.waitForUser();

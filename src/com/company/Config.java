@@ -6,20 +6,20 @@ import com.company.buildings.Warehouse;
 
 public class Config {
     public static final int NUMBER_OF_FARMS_TO_OFFER = 3;
-    public static final int HECTARE_PRICE = 30000;
+    public static final int HECTARE_PRICE = 10000;
     public static final double VALUE_LOSS = 0.9;
     public static final int YEAR_LEN = 52;
 
     public static final Building[] BUILDINGS = {
-            new BreedingBuilding(50000, 100),
-            new BreedingBuilding(100000, 200),
-            new BreedingBuilding(200000, 300),
-            new BreedingBuilding(500000, 500),
-            new BreedingBuilding(1000000, 1000),
-            new Warehouse(250000, 100000),
-            new Warehouse(500000, 250000),
-            new Warehouse(750000, 500000),
-            new Warehouse(1500000, 1000000),
-            new Warehouse(3000000, 5000000)
+            new BreedingBuilding(5000, 5),
+            new BreedingBuilding(6900, 7),
+            new BreedingBuilding(8700, 9),
+            new BreedingBuilding(9500, 10),
+            new BreedingBuilding(14000, 15),
+            new Warehouse(15000, 5000),
+            new Warehouse(17000, 6000),
+            new Warehouse(19000, 7000),
+            new Warehouse(21000, 8000),
+            new Warehouse(25000, 10000)
     };
 }

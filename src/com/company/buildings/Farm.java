@@ -1,5 +1,6 @@
 package com.company.buildings;
 
+import com.company.items.Container;
 import com.company.items.Field;
 import com.company.items.PlantsSpecies;
 
@@ -87,6 +88,39 @@ public class Farm {
         if (fieldToCrop.getNumberOfCrops() == 0) {
             fields.remove(fieldToCrop);
         }
+    }
+
+    public int feed(PlantsSpecies plant, int amount) {
+        for (Warehouse w : getWarehouses()) {
+            List<Container> containersToRemove = new ArrayList<>();
+            for (Container c : w.getContainers()) {
+                if (amount == 0) {
+                    return 0;
+                }
+                if (c.getPlantType() == plant) {
+                    if (c.getUnits() <= amount) {
+                        containersToRemove.add(c);
+                        amount -= c.getUnits();
+                    } else {
+                        try {
+                            w.subtractPlants(c, amount);
+                            return 0;
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
+            }
+
+            for (Container c : containersToRemove) {
+                try {
+                    w.subtractPlants(c, c.getUnits());
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        return amount;
     }
 
     public int farmValue() {

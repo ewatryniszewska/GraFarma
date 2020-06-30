@@ -42,7 +42,7 @@ public enum AnimalsSpecies implements Species {
     public int maxAge;
     public int fodderPerWeek;
     public List<PlantsSpecies> plantsEaten;
-    protected double breedingChance;
+    public double breedingChance;
 
     AnimalsSpecies(String speciesName, int maturityAge, int minSellAge, String productName, int productionPerWeek,
                    String productionUnit, int productSellPrice, int maturePrice, int immaturePrice,
@@ -88,6 +88,6 @@ public enum AnimalsSpecies implements Species {
 
     @Override
     public int getBuyPrice() {
-        return immaturePrice;
+        return (int) (immaturePrice * 1.2);
     }
 }

@@ -9,7 +9,10 @@ public class Player {
     private int cash;
     private List<Farm> farmList;
 
+    private boolean gameIsOn;
+
     public Player(int cash) {
+        gameIsOn = true;
         this.cash = cash;
         farmList = new ArrayList<>();
     }
@@ -28,6 +31,14 @@ public class Player {
 
     public List<Farm> getFarmList() {
         return farmList;
+    }
+
+    public boolean getGameIsOn() {
+        return gameIsOn;
+    }
+
+    public void endGame() {
+        gameIsOn = false;
     }
 
     public void setFarmList(List<Farm> farmList) {
