@@ -9,7 +9,7 @@ import com.company.items.*;
 import java.util.*;
 
 import static com.company.Config.*;
-import static com.company.Other.weekOfTheYear;
+import static com.company.Other.*;
 
 public class Game {
     private Player player;
@@ -20,7 +20,7 @@ public class Game {
     private Generator generator;
 
     public Game() {
-        player = new Player(10000000);
+        player = new Player(5000000);
         week = 1;
         generator = new Generator();
 
@@ -235,7 +235,7 @@ public class Game {
                     }
 
                     Container container = containers.get(itemChoice);
-                    int maxHaWeight = container.getWeight() / container.getPlantType().plantingKgPerHa;
+                    int maxHaWeight = container.getUnits() / container.getPlantType().plantingUnitsPerHa;
                     int maxHaMoney = player.getCash() / container.getPlantType().plantingCost;
 
                     int totalMax = Math.min(Math.min(maxHaMoney, maxHaWeight),
@@ -250,8 +250,9 @@ public class Game {
                     numberOfItems = view.getInteger(0, totalMax);
 
                     try {
-                        warehouses.get(numberOfBuilding).subtractPlants(container, numberOfItems);
-                        player.getFarmList().get(selectedOption).sow(container.getPlantType(), numberOfItems);
+                        warehouses.get(numberOfBuilding).subtractPlants(container,
+                                numberOfItems * container.getPlantType().plantingUnitsPerHa);
+                        player.getFarmList().get(selectedOption).sow(getGrowType(container.getPlantType()), numberOfItems);
                         player.subtractCash(numberOfItems * container.getPlantType().plantingCost);
 
                         System.out.println("Posadzono rosliny.");
@@ -328,7 +329,7 @@ public class Game {
                     }
 
                     try {
-                        warehousesWithSpace.get(numberOfBuilding).addItems(field.getPlantType(), cropSize);
+                        warehousesWithSpace.get(numberOfBuilding).addItems(getCropType(field.getPlantType()), cropSize);
                         player.getFarmList().get(selectedOption).crop(field);
                         player.subtractCash(cropCost);
                         System.out.println("Zebrano plony.");
@@ -403,13 +404,15 @@ public class Game {
                         }
 
                         System.out.println("Ile kikogramow chcesz sprzedac?");
-                        numberOfItems = view.getInteger(0, warehouse.getContainers().get(itemChoice).getWeight());
+                        numberOfItems = view.getInteger(0, warehouse.getContainers().get(itemChoice).getUnits());
 
                         warehouse.getContainers().get(itemChoice).addWeight(-numberOfItems);
-                        int money = numberOfItems * warehouse.getContainers().get(itemChoice).getPlantType().kgPrice;
+                        int money = numberOfItems * warehouse.getContainers().get(itemChoice).getPlantType().unitPrice;
                         player.addCash(money);
 
-                        System.out.println("Sprzedano " + numberOfItems + " kg za " + money + " zl.");
+                        System.out.println("Sprzedano " + numberOfItems + " " +
+                                warehouse.getContainers().get(itemChoice).getPlantType().unit +
+                                " za " + money + " zl.");
                     }
                     break;
                 case 9:
@@ -496,10 +499,7 @@ public class Game {
                     }
                     break;
                 case 10:
-                    System.out.println("Wybrano 10");
-                    break;
-                case 11:
-                    System.out.println("Wybrano 11");
+                    view.printRules();
                     break;
                 case 0:
                     // zwiekszenie tygodnia

@@ -25,7 +25,7 @@ public class Warehouse extends Building {
     public int getOccupiedSpace() {
         int currentWeight = 0;
         for (Container container : containers) {
-            currentWeight += container.getWeight();
+            currentWeight += container.getUnits();
         }
         return currentWeight;
     }
@@ -35,11 +35,11 @@ public class Warehouse extends Building {
     }
 
     public void subtractPlants(Container container, int amount) throws Exception {
-        if (container.getWeight() < amount) {
+        if (container.getUnits() < amount) {
             throw new Exception("Nie mozna usunac az tyle zasobu");
         }
         container.addWeight(-amount);
-        if (container.getWeight() == 0) {
+        if (container.getUnits() == 0) {
             containers.remove(container);
         }
     }
@@ -74,7 +74,7 @@ public class Warehouse extends Building {
     public String detailsToString() {
         String str = toString();
         str += "\nObecnie w budynku znajduje sie " + containers.size() + " roznych gatunkow roslin w kontenerach.\n";
-        str += "Ich waga to " + getOccupiedSpace() + " kg. Dostepne miejsce dla " + getLeftSpace() + " kg roslin\n";
+        str += "Ich waga to " + getOccupiedSpace() + " kg. Dostepne miejsce dla " + getLeftSpace() + " kg roslin";
         return str;
     }
 }

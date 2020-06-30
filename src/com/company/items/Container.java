@@ -2,23 +2,23 @@ package com.company.items;
 
 public class Container {
     protected PlantsSpecies plantType;
-    protected int weight;
+    protected int units;
 
-    public Container(PlantsSpecies plantType, int weight) {
+    public Container(PlantsSpecies plantType, int units) {
         this.plantType = plantType;
-        this.weight = weight;
+        this.units = units;
     }
 
     public String toString() {
-        return plantType.plantName + "; " + weight + " kg";
+        return plantType.plantName + "; " + units + " " + plantType.unit;
     }
 
-    public int getWeight() {
-        return weight;
+    public int getUnits() {
+        return units;
     }
 
     public void addWeight(int weight) {
-        this.weight += weight;
+        this.units += weight;
     }
 
     public PlantsSpecies getPlantType() {

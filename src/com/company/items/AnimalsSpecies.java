@@ -6,26 +6,26 @@ import java.util.List;
 import static com.company.Config.YEAR_LEN;
 
 public enum AnimalsSpecies implements Species {
-    PIG("Swinia", 10, 6, null, 0,
+    PIG("Swinia", 15, 6, null, 0,
             null, 0, 1000, 500, 3,
             300, 10, 5 * YEAR_LEN, 40,
-            Arrays.asList(PlantsSpecies.POTATO), 0.05);
-//        COW("Krowa", 20, 10, "mleko", 10000,
-//                    "litr", 4, 3000, 1000, 10,
-//                    1000, 100, 10 * YEAR_LEN, 200, Arrays.asList(PlantsSpecies.POTATO),
-//                0.1),
-//        CHICKEN("Kura", 5, 2, "jajko", 100,
-//                    "sztuka", 1, 500, 200, 3,
-//                    30, 2, 3 * YEAR_LEN, 10, Arrays.asList(PlantsSpecies.POTATO),
-//                0.2),
-//        GOAT("Koza", 10, 4, "mleko", 1000,
-//                    "litr", 10, 2000, 800, 6,
-//                    100, 20, 5 * YEAR_LEN, 60, Arrays.asList(PlantsSpecies.POTATO),
-//                0.3),
-//        HORSE("Kon", 30, 12, null, 0,
-//                    null, 0, 10000, 1500, 10,
-//                    800, 100, 15 * YEAR_LEN, 150, Arrays.asList(PlantsSpecies.POTATO),
-//                0.1);
+            Arrays.asList(PlantsSpecies.POTATO, PlantsSpecies.CARROT, PlantsSpecies.LETTUCE, PlantsSpecies.OAT, PlantsSpecies.APPLE), 0.05),
+    COW("Krowa", 30, 10, "mleko", 100000,
+            "litr", 4, 3000, 1000, 10,
+            1500, 100, 10 * YEAR_LEN, 200, Arrays.asList(PlantsSpecies.LETTUCE, PlantsSpecies.OAT),
+            0.1),
+    CHICKEN("Kura", 8, 2, "jajko", 100,
+            "sztuka", 1, 500, 200, 1,
+            50, 5, 2 * YEAR_LEN, 10, Arrays.asList(PlantsSpecies.OAT, PlantsSpecies.CARROT_SEED, PlantsSpecies.LETTUCE_SEED),
+            0.2),
+    GOAT("Koza", 10, 4, "mleko", 5000,
+            "litr", 10, 2000, 800, 4,
+            200, 10, 5 * YEAR_LEN, 50, Arrays.asList(PlantsSpecies.LETTUCE, PlantsSpecies.CARROT, PlantsSpecies.OAT),
+            0.3),
+    HORSE("Kon", 30, 12, null, 0,
+            null, 0, 10000, 5000, 10,
+            1000, 80, 15 * YEAR_LEN, 150, Arrays.asList(PlantsSpecies.APPLE, PlantsSpecies.CARROT, PlantsSpecies.OAT),
+            0.1);
 
     public int maturityAge;
     public int minSellAge;

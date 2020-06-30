@@ -3,6 +3,7 @@ package com.company;
 import com.company.buildings.Farm;
 import com.company.items.AnimalsSpecies;
 import com.company.items.AnimalsSummary;
+import com.company.items.PlantsSpecies;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,7 +25,7 @@ public class View {
         System.out.println("1.  Zakup farmy.\n2.  Zakup ziemi uprawnej.\n3.  Sprzedaz ziemi uprawnej.\n" +
                 "4.  Zakup budynkow.\n5.  Zakup zwierzat lub roslin.\n6.  Posadzenie roslin.\n" +
                 "7.  Zbiory roslin.\n8.  Sprzedaz zwierzat lub roslin.\n9.  Informacje o farmach." +
-                "\n0.  Zakonczenie tygodnia.");
+                "\n10. Zasady gry.\n0.  Zakonczenie tygodnia.");
 
         return scanner.nextInt();
     }
@@ -130,6 +131,36 @@ public class View {
         }
 
         return null;
+    }
+
+    public void printRules() {
+        System.out.println("Zasady gry:");
+        System.out.println("Gra turowa w farmera polega na zarzadzaniu farma.");
+        System.out.println("Celem gry jest:");
+        System.out.println("  - posiadanie conajmniej 20ha ziemi uprawnej");
+        System.out.println("  - posiadanie conajmniej 5 roznych gatunkow zwierzat");
+        System.out.println("  - posiadanie conajmniej 5 roznych posadzonych gatunkow roslin");
+        System.out.println("  - jedzenie dla wszystkich zwierzat na rok");
+        System.out.println();
+        System.out.println("Pieniadze zarabiac mozesz:");
+        System.out.println("  - hodujac, a nastepnie sprzedajac zwierzeta lub ich produkty");
+        System.out.println("  - uprawiajac, a nastepnie sprzedajac rosliny");
+        System.out.println();
+        System.out.println("W grze dostepne sa nastepujace gatunki roslin:");
+        for (PlantsSpecies ps : PlantsSpecies.values()) {
+            System.out.println(ps.plantInfo() + "\n");
+        }
+        System.out.println("W grze dostepne sa nastepujace gatunki zwierzat:");
+        for (AnimalsSpecies as : AnimalsSpecies.values()) {
+            System.out.println(as.speciesInfo() + "\n");
+        }
+        System.out.println("Akcje pod koniec tygodnia:");
+        System.out.println("  - zwierzeta: starzeja sie, zjadaja pokarm, przybieraja na wadze, daja produkty, rozmnazaja sie");
+        System.out.println("  - rosliny: rosna, ponosisz koszty ochrony roslin przed szkodnikami");
+        System.out.println("Jezeli zabraknie paszy dla zwierzat - zwierzeta chudna i moga umrzec.");
+        System.out.println("Jezeli zabraknie pieniedzy na srodki ochrony roslin - uprawy moga zostac zniszczone.");
+        System.out.println();
+        System.out.println("UDANEJ ROZGRYWKI!");
     }
 
     public void waitForUser() {
