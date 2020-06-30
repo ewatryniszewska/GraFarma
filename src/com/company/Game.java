@@ -12,42 +12,51 @@ import static com.company.Config.*;
 import static com.company.Other.*;
 
 public class Game {
-    private Player player;
+    private List<Player> players;
 
     private int week;
     private List<Farm> farmsToOffer;
 
     private Generator generator;
+    private View view;
 
     public Game() {
-        player = new Player(250000);
         week = 1;
         generator = new Generator();
+        view = new View();
+        players = new ArrayList<>();
 
-        // generating potential farms to buy
+        // gracze beda mieli taka sama liste farm - moga ze soba o nie konkurowac
         farmsToOffer = generator.generateFarms(NUMBER_OF_FARMS_TO_OFFER);
     }
 
     protected void startGame() {
-        System.out.println("Wpisz 'tak', jezeli chcesz rozpoczac gre.");
-        Scanner scanner = new Scanner(System.in);
-        String answer = scanner.next();
+        System.out.println("Ilu graczy ma grac?");
+        int answer = view.getInteger(1, 10);
 
-        if (answer.equals("tak")) {
-            gameOn();
-        } else if (answer.equals("motherlode")) {
-            player.addCash(5000000);
-            gameOn();
+        for (int i = 0; i < answer; i++) {
+            String name = view.getName(i);
+            int cash = 250000;
+            if (name.equals("motherlode")) {
+                cash += 5000000;
+            }
+            players.add(new Player(name, cash));
         }
+
+        gameOn();
     }
 
     protected void gameOn() {
-        View view = new View();
         int selectedOption, numberOfBuilding, itemChoice, numberOfItems;
         List<Building> bl;
         Building building;
 
-        while (player.getGameIsOn()) {
+        int isNowPlaying = 0;
+        Player player;
+
+        while (players.size() > 0) {
+            player = players.get(isNowPlaying);
+
             view.printGameInfo(week, player);
             switch (view.mainMenu()) {
                 case 1:
@@ -525,6 +534,13 @@ public class Game {
                 case 10:
                     view.printRules();
                     break;
+                case 123:
+                    players.remove(player);
+                    if (isNowPlaying >= players.size()) {
+                        week++;
+                        isNowPlaying = 0;
+                    }
+                    break;
                 case 0:
                     // dane do podsumowania
                     int deadAnimals = 0;
@@ -616,15 +632,22 @@ public class Game {
                                 tempDeadFields.add(f);
                             }
 
+                            double death;
                             // ochrona roslin
                             if (player.getCash() < f.getPlantType().pestProtectionCost * f.getNumberOfHectares()) {
-                                double death = Math.random();
+                                death = Math.random();
                                 if (death < 0.1) {
                                     tempDeadFields.add(f);
                                 }
                             } else {
                                 pesticidesCost += f.getPlantType().pestProtectionCost * f.getNumberOfHectares();
                                 player.subtractCash(f.getPlantType().pestProtectionCost * f.getNumberOfHectares());
+                            }
+
+                            // powodzie, susze, stonka - 5% szans
+                            death = Math.random();
+                            if (death < 0.05) {
+                                tempDeadFields.add(f);
                             }
                         }
 
@@ -665,12 +688,16 @@ public class Game {
                         System.out.println();
                         System.out.println("Jezeli chcesz zakonczyc gre wpisz 1, aby kontynuowac wpisz 0.");
                         if (view.getInteger(0, 1) == 1) {
-                            player.endGame();
+                            players.remove(player);
+                            isNowPlaying--;
                         }
                     }
 
-                    // zwiekszenie tygodnia
-                    week++;
+                    // zmiana gracza lub zwiekszenie tygodnia
+                    if (++isNowPlaying >= players.size()) {
+                        week++;
+                        isNowPlaying = 0;
+                    }
                     break;
             }
             view.waitForUser();

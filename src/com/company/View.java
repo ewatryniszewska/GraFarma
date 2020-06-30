@@ -5,6 +5,7 @@ import com.company.items.AnimalsSpecies;
 import com.company.items.AnimalsSummary;
 import com.company.items.PlantsSpecies;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -20,12 +21,17 @@ public class View {
         scanner = new Scanner(System.in);
     }
 
+    public String getName(int i) {
+        System.out.println("Podaj imie gracza nr " + (i + 1) + ":");
+        return scanner.next();
+    }
+
     public int mainMenu() {
         System.out.println("Menu:");
-        System.out.println("1.  Zakup farmy.\n2.  Zakup ziemi uprawnej.\n3.  Sprzedaz ziemi uprawnej.\n" +
-                "4.  Zakup budynkow.\n5.  Zakup zwierzat lub roslin.\n6.  Posadzenie roslin.\n" +
-                "7.  Zbiory roslin.\n8.  Sprzedaz zwierzat lub roslin.\n9.  Informacje o farmach." +
-                "\n10. Zasady gry.\n0.  Zakonczenie tygodnia.");
+        System.out.println("1.   Zakup farmy.\n2.   Zakup ziemi uprawnej.\n3.   Sprzedaz ziemi uprawnej.\n" +
+                "4.   Zakup budynkow.\n5.   Zakup zwierzat lub roslin.\n6.   Posadzenie roslin.\n" +
+                "7.   Zbiory roslin.\n8.   Sprzedaz zwierzat lub roslin.\n9.   Informacje o farmach." +
+                "\n10.  Zasady gry.\n123. Zakoncz gre.\n0.   Zakonczenie tygodnia.");
 
         return scanner.nextInt();
     }
@@ -40,6 +46,8 @@ public class View {
     }
 
     public void printGameInfo(int week, Player player) {
+        System.out.println("-------------------------------------------------------");
+        System.out.println("Teraz gra: " + player.getName());
         System.out.println("-------------------------------------------------------");
         System.out.println("Calkowita liczba tygodni: " + week + "                " + player.getCash() + " zl");
         System.out.println("Tydzien " + weekOfTheYear(week) + " roku " + theYear(week) +
@@ -167,7 +175,8 @@ public class View {
         System.out.println("Wcisnij enter aby przejsc dalej.");
         try {
             System.in.read();
-        } catch (Exception e) {
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 }

@@ -6,12 +6,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Player {
+    private String name;
+
     private int cash;
     private List<Farm> farmList;
 
     private boolean gameIsOn;
 
-    public Player(int cash) {
+    public Player(String name, int cash) {
+        this.name = name;
         gameIsOn = true;
         this.cash = cash;
         farmList = new ArrayList<>();
@@ -35,6 +38,10 @@ public class Player {
 
     public boolean getGameIsOn() {
         return gameIsOn;
+    }
+
+    public String getName() {
+        return name;
     }
 
     public void endGame() {
