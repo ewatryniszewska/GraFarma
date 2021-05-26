@@ -7,20 +7,18 @@
 
 ## Table of Contents
 
-* [Farm simulator - Gra Farma](#farm-simulator---gra-farma)
-  - [Table of Contents](#table-of-contents)
-  - [General Information](#general-information)
-  - [Technologies Used](#technologies-used)
-  - [Features](#features)
-  - [Gameplay](#gameplay)
-    + [Buy a farm](#buy-a-farm)
-    + [Buing and selling land, buing buildings](#buing-and-selling-land-and-buildings)
-    + [Buing and selling goods](#buing-and-selling-goods)
-  - [Setup](#setup)
-  - [Development](#development)
-  - [Project Status](#project-status)
-  - [Room for Improvement](#room-for-improvement)
-  - [Contact](#contact)
+* [General Information](#general-information)
+* [Technologies Used](#technologies-used)
+* [Features](#features)
+* [Gameplay](#gameplay)
+  - [Buy a farm](#buy-a-farm)
+  - [Buing and selling land, buing buildings](#buing-and-selling-land-and-buildings)
+  - [Buing and selling goods](#buing-and-selling-goods)
+* [Setup](#setup)
+* [Development](#development)
+* [Project Status](#project-status)
+* [Room for Improvement](#room-for-improvement)
+* [Contact](#contact)
 
 
 ## General Information
